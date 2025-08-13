@@ -2,8 +2,6 @@
 
 namespace Movie.Services.Background
 {
-    
-
     public class SearchLogQueue : ISearchLogQueue
     {
         private readonly Channel<SearchLog> _queue =

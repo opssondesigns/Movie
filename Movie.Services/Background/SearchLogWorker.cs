@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Movie.Data.Database;
+using Movie.Entities;
 
 namespace Movie.Services.Background
 {
-    // Infrastructure/SearchLogWorker.cs
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Hosting;
-    using Movie.Data.Database;
-    using Movie.Entities;
-
     public class SearchLogWorker : BackgroundService
     {
         private readonly ISearchLogQueue _queue;
@@ -54,8 +47,7 @@ namespace Movie.Services.Background
                     }
 
                     await db.SaveChangesAsync(stoppingToken);
-
-                    // Keep only latest 5 for this user
+                    
                     var oldIds = await db.SearchHistories
                         .Where(h => h.UserId == log.UserId)
                         .OrderByDescending(h => h.SearchDate)

@@ -86,39 +86,24 @@ public class AccountController : ControllerBase
         return Ok(userInfo);
     }
 
-    //[HttpPost("logout")]
-    //public async Task<IActionResult> Logout()
-    //{
-    //    await _signInManager.SignOutAsync();
-    //    return Ok(new { message = "Logged out" });
-    //}
-
-
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
-        // 1) Sign out of Identity’s app cookie (same scheme that signed in)
         await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
 
-        // 2) Also sign out via SignInManager (covers other Identity bits)
         await _signInManager.SignOutAsync();
 
-        // 3) Clear session data
         HttpContext.Session.Clear();
 
-        // 4) Belt-and-suspenders: delete possible cookie names by hand
-        //    (use the exact names you configured in Program.cs)
         Response.Cookies.Delete(".MovieHub.Auth", new CookieOptions { Path = "/" });
-        Response.Cookies.Delete(".AspNetCore.Identity.Application", new CookieOptions { Path = "/" }); // legacy, just in case
+        Response.Cookies.Delete(".AspNetCore.Identity.Application", new CookieOptions { Path = "/" });
         Response.Cookies.Delete(".MovieHub.Session", new CookieOptions { Path = "/" });
         Response.Cookies.Delete(".AspNetCore.Session", new CookieOptions { Path = "/" });
 
-        // 5) No content, no redirects (prevents browser caching weirdness)
-        return NoContent(); // 204
+        return NoContent(); 
     }
 
 }
-
 
 public class RegisterDto
 {

@@ -1,0 +1,46 @@
+@import url('moviecarousel.css');
+.pager {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    margin: 18px 0 8px;
+    flex-wrap: wrap;
+}
+
+.pager-btn,
+.pager-page {
+    border: 1px solid #374151; 
+    background: #111827; 
+    color: #e5e7eb; 
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    min-width: 40px;
+    transition: background .15s, transform .1s;
+}
+
+    .pager-btn:hover,
+    .pager-page:hover {
+        background: #1f2937;
+    }
+
+    .pager-btn:active,
+    .pager-page:active {
+        transform: scale(.97);
+    }
+
+    .pager-btn:disabled {
+        opacity: .4;
+        pointer-events: none;
+    }
+
+    .pager-page.active {
+        background: #374151;
+        font-weight: 700;
+    }
+
+.pager-ellipsis {
+    color: #9ca3af;
+    padding: 0 4px;
+}

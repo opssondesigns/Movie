@@ -1,24 +1,9 @@
-const API_URL = "http://localhost:5037/api/movie";
+﻿const API_URL = "http://localhost:5037/api/movie";
 const ACCOUNT_API = "http://localhost:5037/api/account";
-
-export const getMovies = async () => {
-    const response = await fetch(
-        `${API_URL}?title=${encodeURIComponent("wedding")}`,
-        {
-            credentials: "include",
-            cache: "no-store",
-        }
-    );
-    if (!response.ok) throw new Error("Failed to fetch movies");
-    const data = await response.json();
-    console.log("Movies", data);
-    return data;
-};
 
 let currentController = null;
 
 export async function searchMoviesByTitle(title) {
-    // Abort previous request if it exists
     if (currentController) {
         currentController.abort();
     }
@@ -90,7 +75,7 @@ export async function loginUser(email, password) {
     if (!response.ok) {
         throw new Error("Invalid credentials");
     }
-    return response.json(); // Expected to include token
+    return response.json(); 
 }
 
 export async function getUserInfo() {
@@ -99,15 +84,12 @@ export async function getUserInfo() {
         cache: 'no-store',
     });
 
-    // Handle unauthenticated cleanly
     if (res.status === 401) return null;
     if (!res.ok) throw new Error(`GET /me failed: ${res.status}`);
 
     const data = await res.json();
-    console.log('userInfo', data); // <- you'll see Claims here
+    console.log('userInfo', data); 
 
-    // Normalize field names for the UI
-    // API returns { FullName, Username, Claims }
     return {
         fullName: data.fullName ?? data.FullName ?? data.Username ?? null,
         username: data.Username ?? null,
@@ -123,16 +105,6 @@ export async function logoutUser() {
         cache: 'no-store',
     });
     if (!res.ok) throw new Error(`POST /logout failed: ${res.status}`);
-}
-
-
-export async function getLastSearches() {
-    const res = await fetch(`${API_URL}/history`, {
-        credentials: 'include',
-        cache: 'no-store',
-    });
-    if (!res.ok) return [];
-    return res.json();
 }
 
 export async function getMoviesFromHistory() {

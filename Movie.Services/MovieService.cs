@@ -12,11 +12,8 @@ namespace Movie.Services
             _movieRepository = movieRepository;
         }
 
-        public async Task<IEnumerable<dynamic>> GetMoviesAsync(string? title = null)
-        {
-            if (string.IsNullOrWhiteSpace(title))
-                return await _movieRepository.SearchMoviesByTitle();
-
+        public async Task<IEnumerable<dynamic>> GetMoviesAsync(string title)
+        {    
             return await _movieRepository.SearchMoviesByTitle(title);
         }
 

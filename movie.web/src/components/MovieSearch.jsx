@@ -1,18 +1,17 @@
-// components/MovieSearch.jsx
 import React, { useEffect, useState } from "react";
 import { searchMoviesByTitle } from "../services/movieService";
 import MovieCard from "./MovieCard";
 import SearchBar from "./SearchBar";
 import Pagination from "./Pagination";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 12;
 
 export default function MovieSearch() {
     const [movies, setMovies] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
-    const [hasNext, setHasNext] = useState(false); // does OMDb have another page?
+    const [hasNext, setHasNext] = useState(false); 
 
     useEffect(() => {
         if (!searchQuery) {
@@ -31,7 +30,7 @@ export default function MovieSearch() {
                     signal: controller.signal,
                 });
                 setMovies(results || []);
-                setHasNext((results?.length || 0) === PAGE_SIZE); // OMDb pages are 10
+                setHasNext((results?.length || 0) === PAGE_SIZE); 
             } catch (err) {
                 if (err.name !== "AbortError") console.error(err);
                 setMovies([]);
@@ -44,24 +43,22 @@ export default function MovieSearch() {
         return () => controller.abort();
     }, [searchQuery, page]);
 
-    // when query changes, reset to first page
     const handleSearch = (q) => {
         setSearchQuery(q);
         setPage(1);
     };
 
-    // We don't know the real total; simulate it so the pager shows Next only when we know there's another page.
     const pseudoTotal = page * PAGE_SIZE + (hasNext ? 1 : 0);
 
     return (
         <div style={{ marginBottom: 24 }}>
             <SearchBar onSearch={handleSearch} placeholder="Search movies by title..." />
 
-            {loading && <div style={{ color: "#9CA3AF", marginTop: 8 }}>Searching…</div>}
+            {/*{loading && <div style={{ color: "#9CA3AF", marginTop: 8 }}>Searching…</div>}*/}
 
-            {!loading && movies.length === 0 && searchQuery && (
-                <div style={{ color: "#9CA3AF", marginTop: 8 }}>No results found.</div>
-            )}
+            {/*{!loading && movies.length === 0 && searchQuery && (*/}
+            {/*    <div style={{ color: "#9CA3AF", marginTop: 8 }}>No results found.</div>*/}
+            {/*)}*/}
 
             {!loading && movies.length > 0 && (
                 <>
@@ -80,7 +77,7 @@ export default function MovieSearch() {
 
                     <Pagination
                         page={page}
-                        total={pseudoTotal}   // drives Prev/Next visibility
+                        total={pseudoTotal} 
                         pageSize={PAGE_SIZE}
                         onChange={setPage}
                     />

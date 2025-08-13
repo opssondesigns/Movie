@@ -27,16 +27,14 @@ namespace Movie.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMovies([FromQuery] string? title = null)
+        public async Task<IActionResult> GetMovies([FromQuery] string title)
         {            
-            var moviesTask = _movieService.GetMoviesAsync(title);          
+            var moviesTask = _movieService.GetMoviesAsync(title);        
             
-            if (!string.IsNullOrWhiteSpace(title))
-            {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;                
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;                
 
-                await _searchQueue.EnqueueAsync(new SearchLog(userId, title.Trim()));
-            }
+            await _searchQueue.EnqueueAsync(new SearchLog(userId, title.Trim()));
+            
             var movies = await moviesTask;
             return Ok(movies);
         }
@@ -49,28 +47,6 @@ namespace Movie.Api.Controllers
             return Ok(movie);
         }
 
-        [HttpGet("history")]
-        public async Task<IActionResult> History(CancellationToken ct)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId)) return Unauthorized();
-
-            var recent = await _context.Set<SearchHistory>()
-                .AsNoTracking()
-                .Where(h => h.UserId == userId)
-                .OrderByDescending(h => h.SearchDate)
-                .Select(h => h.SearchTerm)
-                .Take(25)
-                .ToListAsync(ct);
-
-            var terms = recent
-                .Where(t => !string.IsNullOrWhiteSpace(t))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .Take(5)
-                .ToList();
-
-            return Ok(terms);
-        }
         [Authorize]
         [HttpGet("from-history")]
         public async Task<IActionResult> FromHistory(CancellationToken ct)

@@ -1,7 +1,7 @@
 ﻿import React, { useState } from "react";
 import { loginUser } from "../services/movieService";
 import { Link, useNavigate } from "react-router-dom";
-import "./Register.css"; // reuse same CSS
+import "../styles/Register.css";
 
 export function Login({ onLoginSuccess }) {
     const [email, setEmail] = useState("");
@@ -20,7 +20,6 @@ export function Login({ onLoginSuccess }) {
 
             if (onLoginSuccess) onLoginSuccess();
 
-            // Redirect to home after 500ms for UX feedback
             setTimeout(() => {
                 navigate("/");
             }, 500);
@@ -84,7 +83,7 @@ export function Login({ onLoginSuccess }) {
                 <hr />
 
                 <p className="signin-text">
-                    New to Movie Hub?{" "}
+                    New to Movie Hub?
                     <Link to="/register">Create an account</Link>
                 </p>
             </div>

@@ -218,7 +218,7 @@ export default function Navbar() {
                                 role="menuitem"
                             >
                                 <UserIcon />
-                                <span>Your Search</span>
+                                <span>Your Search Lists</span>
                             </Link>
 
                             <button

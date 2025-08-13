@@ -1,7 +1,7 @@
 ﻿import React, { useState } from "react";
 import { registerUser } from "../services/movieService";
 import { Link } from "react-router-dom";
-import "./Register.css";
+import "../styles/Register.css";
 
 export function Register() {
     const [fullName, setFullName] = useState("");
@@ -107,7 +107,7 @@ export function Register() {
                 <hr />
 
                 <p className="signin-text">
-                    Already have an account?{" "}
+                    Already have an account?
                     <Link to="/login">Sign in</Link>
                 </p>
             </div>

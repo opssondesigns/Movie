@@ -10,20 +10,12 @@ using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// =============================
-// Database
-// =============================
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<MovieDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// =============================
-// Identity (cookie-based auth)
-// =============================
-// NOTE: AddIdentity already registers the Identity.Application cookie scheme.
-// Do NOT also call AddAuthentication().AddCookie(...) with the same scheme.
 builder.Services.AddIdentity<MovieIdentityUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = false;
@@ -38,18 +30,16 @@ builder.Services.AddIdentity<MovieIdentityUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<MovieDbContext>()
 .AddDefaultTokenProviders();
 
-// Configure the existing Identity.Application cookie
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.Name = ".MovieHub.Auth";
     options.Cookie.HttpOnly = true;
-    options.Cookie.SameSite = SameSiteMode.Lax;            // dev over http with same-origin/proxy
-    options.Cookie.SecurePolicy = CookieSecurePolicy.None; // allow http://localhost in dev
+    options.Cookie.SameSite = SameSiteMode.Lax;        
+    options.Cookie.SecurePolicy = CookieSecurePolicy.None; 
     options.SlidingExpiration = true;
     options.ExpireTimeSpan = TimeSpan.FromHours(1);
     options.LoginPath = "/api/account/login";
 
-    // Key: don't redirect for API calls
     options.Events = new CookieAuthenticationEvents
     {
         OnRedirectToLogin = ctx =>
@@ -75,26 +65,14 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
-// =============================
-// MVC + Swagger
-// =============================
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// =============================
-// App Services / HTTP clients
-// =============================
 builder.Services.AddHttpClient<IMovieRepository, MovieRepository>();
 builder.Services.AddScoped<MovieService>();
-// after AddDbContext / AddIdentity / etc.
 builder.Services.AddSingleton<ISearchLogQueue, SearchLogQueue>();
 builder.Services.AddHostedService<SearchLogWorker>();
-
-
-// =============================
-// Session (HttpContext.Session)
-// =============================
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -105,9 +83,6 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.None; // allow http in dev
 });
 
-// =============================
-// CORS (for SPA on http://localhost:5173 via Vite)
-// =============================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowMovieHub", policy =>
@@ -121,39 +96,22 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// =============================
-// Dev-only middleware
-// =============================
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// =============================
-// Pipeline order matters
-// =============================
 app.UseHttpsRedirection();
 
 app.UseRouting();
 
-app.UseCors("AllowMovieHub");   // needed when hitting through Vite (5173) with credentials
+app.UseCors("AllowMovieHub");  
 
-app.UseSession();               // make session available before auth if needed
-app.UseAuthentication();        // sets HttpContext.User from Identity cookie
+app.UseSession();           
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
-
-/*
- * Frontend (Vite) should call relative paths so the proxy forwards to the API:
- *   fetch('/api/account/login', { credentials: 'include', ... })
- *   fetch('/api/account/me',    { credentials: 'include' })
- *
- * For production/HTTPS or true cross-origin:
- *   - Use SameSite=None and Secure=Always on cookies
- *   - Serve both SPA and API over HTTPS
- *   - Keep CORS with AllowCredentials and exact origins
- */

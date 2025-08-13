@@ -14,14 +14,12 @@ namespace Movie.Data
             _httpClient = httpClient;
             _configuration = configuration;
         }
-        public async Task<IEnumerable<OmdbMovie>> SearchMoviesByTitle(string? title, int page = 1)
+        public async Task<IEnumerable<OmdbMovie>> SearchMoviesByTitle(string title)
         {
             var baseUrl = _configuration["MovieApi:BaseUrl"];
             var apiKey = _configuration["MovieApi:ApiKey"];
 
-            var fullUrl = string.IsNullOrEmpty(title)
-                            ? $"{baseUrl}?apikey={apiKey}&page={page}"
-                            : $"{baseUrl}?apikey={apiKey}&s={title}&page={page}";
+            var fullUrl = $"{baseUrl}?apikey={apiKey}&s={title}";
 
             var searchResponse = await _httpClient.GetFromJsonAsync<OmdbSearchResponse>(fullUrl);
 
@@ -45,7 +43,6 @@ namespace Movie.Data
             var movieDetail = await _httpClient.GetFromJsonAsync<OmdbMovie>(fullUrl);
             return movieDetail;
         }
-
 
         private class OmdbSearchResponse
         {

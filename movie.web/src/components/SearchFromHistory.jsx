@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { getMoviesFromHistory } from "../services/movieService";
 import MovieCard from "./MovieCard";
 import Pagination from "./Pagination";
-import "./MovieCarousel.css"; // keep your existing grid/card styles if any
+import "../styles/MovieCarousel.css";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 12;
 
 export default function SearchFromHistory() {
     const [queries, setQueries] = useState([]);
@@ -32,13 +32,11 @@ export default function SearchFromHistory() {
         return () => { ok = false; };
     }, []);
 
-    // Filter by chip
     const filtered = useMemo(() => {
         if (active === "all") return all;
         return all.filter(m => (m._query || "").toLowerCase() === active.toLowerCase());
     }, [all, active]);
 
-    // Reset to page 1 when filter changes or results shrink
     useEffect(() => { setPage(1); }, [active, filtered.length]);
 
     const total = filtered.length;
@@ -51,7 +49,6 @@ export default function SearchFromHistory() {
                 Search Results from your last 5 queries
             </h2>
 
-            {/* query chips */}
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
                 <button
                     onClick={() => setActive("all")}
@@ -85,7 +82,6 @@ export default function SearchFromHistory() {
                 <div style={{ color: "#9CA3AF" }}>No movies yet. Search a few titles to build history.</div>
             )}
 
-            {/* paged grid */}
             {!loading && total > 0 && (
                 <>
                     <div

@@ -18,7 +18,6 @@ namespace Movie.Data.Database
         {
         }
 
-        //public DbSet<MovieItem> Movies { get; set; }
         public DbSet<SearchHistory> SearchHistories { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -35,35 +34,13 @@ namespace Movie.Data.Database
                 );
             }
         }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-
-            //modelBuilder.Entity<SearchHistory>(entity =>
-            //{
-            //    entity.HasKey(e => e.Id);
-            //    entity.Property(e => e.UserId)
-            //            .HasMaxLength(255); ;
-
-            //    entity.Property(e => e.SearchTerm)
-            //        .HasMaxLength(255);
-
-            //    entity.Property(e => e.SearchDate)
-            //        .HasDefaultValueSql("GETUTCDATE()");             
-
-            //    entity.ToTable("SearchHistory");
-            //});
-
-            // In OnModelCreating of your DbContext
             modelBuilder.Entity<SearchHistory>()
                 .HasIndex(x => new { x.UserId, x.SearchTerm })
                 .IsUnique();
-
-
-
         }
-
     }
 }
