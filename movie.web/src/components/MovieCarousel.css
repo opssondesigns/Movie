@@ -1,44 +1,115 @@
-.carousel-container {
+/* src/components/MovieCarousel.css */
+
+.carousel-row {
     position: relative;
     width: 100%;
-    overflow: hidden;
-    margin-top: 20px;
+    margin-top: 16px;
+    overflow: hidden; /* hide native scrollbar track area */
 }
 
-.carousel {
-    display: flex;
-    gap: 10px;
+.carousel-track {
+    display: grid;
+    grid-auto-flow: column; /* lay items horizontally */
+    grid-auto-columns: 180px; /* each card width (tweak as you like) */
+    gap: 12px;
+    padding: 8px 56px; /* room for arrows */
     overflow-x: auto;
+    overflow-y: hidden;
     scroll-behavior: smooth;
     scrollbar-width: none; /* Firefox */
 }
 
-    .carousel::-webkit-scrollbar {
-        display: none; /* Chrome/Safari */
+    .carousel-track::-webkit-scrollbar {
+        display: none;
     }
+/* Chrome/Safari */
 
 .scroll-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
-    border: none;
-    font-size: 2rem;
-    padding: 10px;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    background-color: rgba(17, 24, 39, 0.7); /* slate-900-ish */
+    color: #fff;
+    border: 1px solid #374151; /* slate-700 */
+    border-radius: 999px;
     cursor: pointer;
-    z-index: 10;
-    border-radius: 50%;
+    z-index: 5;
+    backdrop-filter: blur(4px);
+    transition: opacity .15s, background-color .2s, transform .12s;
 }
 
     .scroll-btn.left {
-        left: 5px;
+        left: 8px;
     }
 
     .scroll-btn.right {
-        right: 5px;
+        right: 8px;
     }
 
     .scroll-btn:hover {
-        background-color: rgba(0, 0, 0, 0.8);
+        background-color: rgba(31, 41, 55, 0.85);
     }
+
+    .scroll-btn:active {
+        transform: translateY(-50%) scale(.96);
+    }
+
+    .scroll-btn:disabled {
+        opacity: .35;
+        pointer-events: none;
+        cursor: default;
+    }
+
+
+
+
+
+.pager {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    margin: 18px 0 8px;
+    flex-wrap: wrap;
+}
+
+.pager-btn,
+.pager-page {
+    border: 1px solid #374151; /* slate-700 */
+    background: #111827; /* slate-900 */
+    color: #e5e7eb; /* slate-200 */
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    min-width: 40px;
+    transition: background .15s, transform .1s;
+}
+
+    .pager-btn:hover,
+    .pager-page:hover {
+        background: #1f2937;
+    }
+
+    .pager-btn:active,
+    .pager-page:active {
+        transform: scale(.97);
+    }
+
+    .pager-btn:disabled {
+        opacity: .4;
+        pointer-events: none;
+    }
+
+    .pager-page.active {
+        background: #374151;
+        font-weight: 700;
+    }
+
+.pager-ellipsis {
+    color: #9ca3af;
+    padding: 0 4px;
+}

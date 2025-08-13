@@ -1,67 +1,54 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { getMovies } from "../services/movieService";
 import MovieCard from "./MovieCard";
-import "./MovieCarousel.css"; // shared with MovieSearch
+import Pagination from "./Pagination";
+import "./MovieCarousel.css";
 
-const MovieList = ({ title = "Popular Movies" }) => {
+const PAGE_SIZE = 10;
+
+export default function MovieList({ title = "Popular Movies" }) {
     const [movies, setMovies] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const carouselRef = useRef(null);
+    const [page, setPage] = useState(1);
 
     useEffect(() => {
-        let isMounted = true;
+        let mounted = true;
         getMovies()
-            .then((data) => {
-                if (isMounted) setMovies(data || []);
-            })
-            .catch((err) => console.error(err))
-            .finally(() => setLoading(false));
-        return () => {
-            isMounted = false;
-        };
+            .then((data) => { if (mounted) setMovies(data || []); })
+            .catch(console.error);
+        return () => { mounted = false; };
     }, []);
 
-    const scrollLeft = () => {
-        if (carouselRef.current) {
-            carouselRef.current.scrollBy({
-                left: -300,
-                behavior: "smooth",
-            });
-        }
-    };
-
-    const scrollRight = () => {
-        if (carouselRef.current) {
-            carouselRef.current.scrollBy({
-                left: 300,
-                behavior: "smooth",
-            });
-        }
-    };
-
-    if (loading) return <p>Loading...</p>;
+    const total = movies.length;
+    const start = (page - 1) * PAGE_SIZE;
+    const pageItems = movies.slice(start, start + PAGE_SIZE);
 
     return (
-        <div className="movie-search">
+        <div className="movie-search" style={{ padding: 16 }}>
             {title && <h2 className="carousel-title">{title}</h2>}
 
-            {movies.length > 0 && (
-                <div className="carousel-container">
-                    <button className="scroll-btn left" onClick={scrollLeft}>
-                        &#10094;
-                    </button>
-                    <div className="carousel" ref={carouselRef}>
-                        {movies.map((movie, index) => (
+            {total > 0 && (
+                <>
+                    <div
+                        style={{
+                            display: "grid",
+                            gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+                            gap: 16,
+                            marginTop: 12
+                        }}
+                    >
+                        {pageItems.map((movie, index) => (
                             <MovieCard key={movie.imdbID || index} movie={movie} />
                         ))}
                     </div>
-                    <button className="scroll-btn right" onClick={scrollRight}>
-                        &#10095;
-                    </button>
-                </div>
+
+                    <Pagination
+                        page={page}
+                        total={total}
+                        pageSize={PAGE_SIZE}
+                        onChange={setPage}
+                    />
+                </>
             )}
         </div>
     );
-};
-
-export default MovieList;
+}

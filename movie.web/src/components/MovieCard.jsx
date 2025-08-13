@@ -1,192 +1,227 @@
-﻿import React, { useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { getMovieById } from "../services/movieService";
 
-const MovieCard = ({ movie }) => {
+export default function MovieCard({ movie }) {
     const [showModal, setShowModal] = useState(false);
     const [fullDetails, setFullDetails] = useState(null);
     const [isSelected, setIsSelected] = useState(false);
 
-    const handleOpenModal = async () => {
+    const id = movie.imdbID || movie.imdbId;
+    const title = movie.Title || movie.title;
+    const poster = movie.Poster || movie.poster;
+
+    const openModal = async () => {
         try {
-            const details = await getMovieById(movie.imdbID);
+            const details = await getMovieById(id);
             setFullDetails(details);
             setShowModal(true);
-        } catch (error) {
-            console.error("Error fetching movie details:", error);
+        } catch (e) {
+            console.error(e);
         }
     };
 
-    const handleCloseModal = () => {
+    const closeModal = () => {
         setShowModal(false);
         setFullDetails(null);
     };
+    const toggleSelect = () => setIsSelected((v) => !v);
 
-    const handlePlayClick = () => {
-        if (fullDetails?.Title) {
-            const trailerUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(fullDetails.Title)}+trailer`;
-            window.open(trailerUrl, "_blank");
-        }
-    };
-
-    const handleAddToList = () => {
-        setIsSelected(prev => !prev);
-    };
+    useEffect(() => {
+        if (!showModal) return;
+        const onKey = (e) => e.key === "Escape" && closeModal();
+        document.addEventListener("keydown", onKey);
+        return () => document.removeEventListener("keydown", onKey);
+    }, [showModal]);
 
     return (
         <>
-            {/* Movie Poster */}
             <div
+                onClick={openModal}
                 style={{
-                    borderRadius: "8px",
-                    width: "100%",
-                    height: "200px",
-                    overflow: "hidden",
                     cursor: "pointer",
-                    boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-                    transition: "transform 0.2s ease-in-out",
+                    borderRadius: 12,
+                    overflow: "hidden",
+                    background: "#111827",
+                    border: "1px solid #374151",
+                    boxShadow: "0 8px 24px rgba(0,0,0,.25)",
+                    transition: "transform .15s ease",
                 }}
-                onClick={handleOpenModal}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                onMouseEnter={(e) =>
+                    (e.currentTarget.style.transform = "translateY(-2px)")
+                }
+                onMouseLeave={(e) =>
+                    (e.currentTarget.style.transform = "translateY(0)")
+                }
             >
-                <img
-                    src={movie.Poster}
-                    alt={movie.Title}
-                    style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        borderRadius: "8px",
-                    }}
-                />
+                <div style={{ height: 220, background: "#0f172a" }}>
+                    {poster && poster !== "N/A" ? (
+                        <img
+                            src={poster}
+                            alt={title}
+                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                    ) : (
+                        <div
+                            style={{
+                                height: "100%",
+                                display: "grid",
+                                placeItems: "center",
+                                color: "#9CA3AF",
+                            }}
+                        >
+                            No Poster
+                        </div>
+                    )}
+                </div>                
             </div>
 
-            {/* Movie Details Modal */}
             {showModal && fullDetails && (
                 <div
-                    onClick={handleCloseModal}
+                    onClick={closeModal}
                     style={{
                         position: "fixed",
-                        top: 0,
-                        left: 0,
-                        width: "100vw",
-                        height: "100vh",
-                        background: "rgba(0,0,0,0.7)",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        inset: 0,
+                        background: "rgba(0,0,0,.6)",
+                        display: "grid",
+                        placeItems: "center",
                         zIndex: 1000,
-                        padding: "20px",
                     }}
                 >
                     <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label={`${fullDetails.Title} details`}
                         onClick={(e) => e.stopPropagation()}
                         style={{
-                            background: "#181818",
-                            padding: "20px",
-                            borderRadius: "10px",
-                            width: "100%",
-                            maxWidth: "700px",
-                            color: "#fff",
-                            display: "flex",
-                            gap: "20px",
-                            boxShadow: "0 6px 20px rgba(0,0,0,0.4)",
+                            width: "min(900px,92vw)",
+                            background: "#0B1220",
+                            border: "1px solid #374151",
+                            borderRadius: 16,
+                            overflow: "hidden",
+                            display: "grid",
+                            gridTemplateColumns: "280px 1fr",
                             position: "relative",
                         }}
-                    >
-                        {/* "X" Close Button */}
+                    >                       
                         <button
-                            onClick={handleCloseModal}
+                            onClick={closeModal}
+                            aria-label="Close"
                             style={{
                                 position: "absolute",
-                                top: "10px",
-                                right: "15px",
-                                background: "transparent",
-                                border: "none",
-                                color: "#fff",
-                                fontSize: "1.5rem",
-                                fontWeight: "bold",
+                                top: 10,
+                                right: 10,
+                                width: 46,
+                                height: 46,
+                                borderRadius: "9999px",
+                                background: "rgba(17,24,39,.65)",
+                                color: "#E5E7EB",
+                                border: "1px solid #374151",
                                 cursor: "pointer",
+                                backdropFilter: "blur(4px)",
+                                transition: "transform .12s ease, background .15s ease, box-shadow .15s ease",
+                                boxShadow: "0 6px 20px rgba(0,0,0,.35)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                padding: 0,
+                                lineHeight: 0,
+                                boxSizing: "border-box",
                             }}
-                            onMouseEnter={(e) => (e.target.style.color = "#ff4d4d")}
-                            onMouseLeave={(e) => (e.target.style.color = "#fff")}
+                            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(31,41,55,.85)")}
+                            onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(17,24,39,.65)")}
+                            onMouseDown={(e) => (e.currentTarget.style.transform = "scale(.96)")}
+                            onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
                         >
-                            &times;
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                aria-hidden="true"
+                                style={{ display: "block" }}        
+                            >
+                                <path d="M6 6l12 12M18 6L6 18"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round" />
+                            </svg>
                         </button>
-
-                        {/* Poster */}
-                        <div style={{ flex: "0 0 200px" }}>
-                            <img
-                                src={fullDetails.Poster}
-                                alt={fullDetails.Title}
-                                style={{
-                                    width: "100%",
-                                    borderRadius: "8px",
-                                    objectFit: "cover",
-                                }}
-                            />
-                        </div>
-
-                        {/* Details */}
-                        <div style={{ flex: 1 }}>
-                            <h2 style={{ marginBottom: "5px", fontSize: "1.8rem" }}>
-                                {fullDetails.Title}
-                            </h2>
-                            <p style={{ fontSize: "0.9rem", color: "#aaa" }}>
-                                {fullDetails.Type?.toUpperCase()} • {fullDetails.Year}
-                            </p>
-
-                            <p style={{ marginTop: "10px", lineHeight: "1.4", color: "#ccc" }}>
-                                {fullDetails.Plot || "No description available."}
-                            </p>
-
-                            <div style={{ marginTop: "15px", fontSize: "0.95rem", color: "#ddd" }}>
-                                <p><strong>Genre:</strong> {fullDetails.Genre}</p>
-                                <p><strong>Cast:</strong> {fullDetails.Actors}</p>
-                                <p><strong>Language:</strong> {fullDetails.Language}</p>
-                                <p><strong>Rated:</strong> {fullDetails.Rated}</p>
-                                <p><strong>Released:</strong> {fullDetails.Released}</p>
-                            </div>
-
-                            {fullDetails.imdbRating && (
-                                <p style={{ marginTop: "10px", fontWeight: "bold", color: "#ffcc00" }}>
-                                    ⭐ IMDb Score: {fullDetails.imdbRating}
-                                </p>
+                        
+                        <div style={{ background: "#0f172a", minHeight: 360 }}>
+                            {fullDetails.Poster && fullDetails.Poster !== "N/A" ? (
+                                <img
+                                    src={fullDetails.Poster}
+                                    alt={fullDetails.Title}
+                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                />
+                            ) : (
+                                <div
+                                    style={{
+                                        height: "100%",
+                                        display: "grid",
+                                        placeItems: "center",
+                                        color: "#9CA3AF",
+                                    }}
+                                >
+                                    No Poster
+                                </div>
                             )}
-                          
-                            <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
+                        </div>
+                        
+                        <div style={{ padding: 18, color: "#E5E7EB" }}>
+                            <div style={{ fontSize: 22, fontWeight: 800 }}>
+                                {fullDetails.Title}
+                            </div>
+                            <div style={{ color: "#9CA3AF", marginTop: 4 }}>
+                                {fullDetails.Year} • {fullDetails.Runtime} • {fullDetails.Genre}
+                            </div>
+                            <div style={{ marginTop: 10, lineHeight: 1.5 }}>
+                                {fullDetails.Plot}
+                            </div>
+                            <div style={{ marginTop: 10, color: "#9CA3AF" }}>
+                                Director:{" "}
+                                <b style={{ color: "#E5E7EB" }}>{fullDetails.Director}</b>
+                                <br />
+                                Actors: <b style={{ color: "#E5E7EB" }}>{fullDetails.Actors}</b>
+                            </div>
+                            {fullDetails.imdbRating && (
+                                <div style={{ marginTop: 12, fontWeight: 700 }}>
+                                    IMDb: <span style={{ color: "#F59E0B" }}>{fullDetails.imdbRating}</span>
+                                </div>
+                            )}
+
+                            <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
                                 <button
-                                    onClick={handlePlayClick}
+                                    onClick={() =>
+                                        window.open(
+                                            `https://www.youtube.com/results?search_query=${encodeURIComponent(
+                                                fullDetails.Title
+                                            )}+trailer`,
+                                            "_blank"
+                                        )
+                                    }
                                     style={{
-                                        flex: "0.2",
-                                        padding: "5px",
-                                        backgroundColor: "#ff4d4d",
-                                        color: "#fff",
-                                        border: "none",
-                                        borderRadius: "5px",
-                                        cursor: "pointer",
-                                        fontSize: "1rem",
-                                        fontWeight: "bold",
+                                        padding: "8px 12px",
+                                        borderRadius: 8,
+                                        border: "1px solid #374151",
+                                        background: "#111827",
+                                        color: "#E5E7EB",
                                     }}
                                 >
-                                    ▶ PLAY
+                                    ▶ Trailer
                                 </button>
                                 <button
-                                    onClick={handleAddToList}
+                                    onClick={toggleSelect}
                                     style={{
-                                        padding: "12px",
-                                        backgroundColor: isSelected ? "#2ecc71" : "#555",
-                                        color: "#fff",
-                                        border: "none",
-                                        borderRadius: "5px",
-                                        fontSize: "1.2rem",
-                                        cursor: "pointer",
-                                        minWidth: "50px",
+                                        padding: "8px 12px",
+                                        borderRadius: 8,
+                                        border: "1px solid #374151",
+                                        background: isSelected ? "#166534" : "#374151",
+                                        color: "#E5E7EB",
                                     }}
-                                    title={isSelected ? "Selected" : "Add to My List"}
                                 >
-                                    {isSelected ? "✓" : "+"}
-                                </button>
+                                    {isSelected ? "✓ Added" : "+ Add"}
+                                </button>                         
                             </div>
                         </div>
                     </div>
@@ -194,6 +229,4 @@ const MovieCard = ({ movie }) => {
             )}
         </>
     );
-};
-
-export default MovieCard;
+}

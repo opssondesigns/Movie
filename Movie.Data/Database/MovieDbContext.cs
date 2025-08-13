@@ -20,7 +20,6 @@ namespace Movie.Data.Database
 
         //public DbSet<MovieItem> Movies { get; set; }
         public DbSet<SearchHistory> SearchHistories { get; set; }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

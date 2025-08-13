@@ -35,7 +35,7 @@ namespace Movie.Services.Background
 
                 try
                 {
-                    // Upsert: if term exists for this user, just bump timestamp
+                    // Upsert
                     var existing = await db.SearchHistories
                         .SingleOrDefaultAsync(h => h.UserId == log.UserId && h.SearchTerm == log.SearchTerm, stoppingToken);
 

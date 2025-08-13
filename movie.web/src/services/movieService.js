@@ -2,11 +2,16 @@ const API_URL = "http://localhost:5037/api/movie";
 const ACCOUNT_API = "http://localhost:5037/api/account";
 
 export const getMovies = async () => {
-    const response = await fetch(`${API_URL}?title=${encodeURIComponent("wedding")}`);
+    const response = await fetch(
+        `${API_URL}?title=${encodeURIComponent("wedding")}`,
+        {
+            credentials: "include",
+            cache: "no-store",
+        }
+    );
     if (!response.ok) throw new Error("Failed to fetch movies");
-    const data = await response.json();  
-    console.log("Movies", data);         
-
+    const data = await response.json();
+    console.log("Movies", data);
     return data;
 };
 
@@ -24,7 +29,11 @@ export async function searchMoviesByTitle(title) {
     try {
         const response = await fetch(
             `${API_URL}?title=${encodeURIComponent(title)}`,
-            { signal }
+            {
+                signal,
+                credentials: "include",
+                cache: "no-store",
+            }
         );
 
         if (!response.ok) {
@@ -32,24 +41,22 @@ export async function searchMoviesByTitle(title) {
         }
 
         const data = await response.json();
-
-        //console.log("search by title data", data);
-
-        // Reset controller after successful fetch
-        currentController = null;
-
         return data || [];
     } catch (error) {
         if (error.name === "AbortError") {
-            // Request was aborted, silently handle or ignore
             return [];
         }
         throw error;
+    } finally {
+        currentController = null;
     }
 }
 
 export async function getMovieById(imdbId) {
-    const response = await fetch(`${API_URL}/${imdbId}`);
+    const response = await fetch(`${API_URL}/${encodeURIComponent(imdbId)}`, {
+        credentials: "include",
+        cache: "no-store",
+    });
     if (!response.ok) throw new Error("Failed to fetch movie details");
     return response.json();
 }
@@ -119,3 +126,20 @@ export async function logoutUser() {
 }
 
 
+export async function getLastSearches() {
+    const res = await fetch(`${API_URL}/history`, {
+        credentials: 'include',
+        cache: 'no-store',
+    });
+    if (!res.ok) return [];
+    return res.json();
+}
+
+export async function getMoviesFromHistory() {
+    const res = await fetch(`${API_URL}/from-history`, {
+        credentials: 'include',
+        cache: 'no-store',
+    });
+    if (!res.ok) throw new Error('Failed to fetch history movies');
+    return res.json(); 
+}

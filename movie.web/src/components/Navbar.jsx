@@ -3,15 +3,15 @@ import { Link } from "react-router-dom";
 import { getUserInfo, logoutUser } from "../services/movieService";
 
 const palette = {
-    chipBg: "#111827",      // slate-900
-    chipBorder: "#374151",  // slate-700
-    surface: "#0B1220",     // dark panel
-    panel: "#111827",       // slate-900
-    border: "#374151",      // slate-700
-    text: "#E5E7EB",        // slate-200
-    subtext: "#9CA3AF",     // slate-400
-    hover: "#1F2937",       // slate-800
-    accent: "#8B5CF6",      // violet-500
+    chipBg: "#111827",      
+    chipBorder: "#374151",  
+    surface: "#0B1220",     
+    panel: "#111827",       
+    border: "#374151",      
+    text: "#E5E7EB",        
+    subtext: "#9CA3AF",     
+    hover: "#1F2937",       
+    accent: "#8B5CF6",     
 };
 
 const styles = {
@@ -134,7 +134,7 @@ const ChevronIcon = (props) => (
 );
 
 export default function Navbar() {
-    const [user, setUser] = useState(null);           // { fullName, username, claims, raw }
+    const [user, setUser] = useState(null);          
     const [open, setOpen] = useState(false);
     const btnRef = useRef(null);
     const panelRef = useRef(null);
@@ -143,7 +143,7 @@ export default function Navbar() {
         let mounted = true;
         (async () => {
             try {
-                const info = await getUserInfo();            // returns null if 401
+                const info = await getUserInfo();           
                 if (mounted) setUser(info);
             } catch {
                 if (mounted) setUser(null);
@@ -204,7 +204,6 @@ export default function Navbar() {
                                 <div style={styles.headerAvatar}>{initials}</div>
                                 <div>
                                     <div style={styles.name}>{displayName}</div>
-                                    {/* Show username/email if you have it */}
                                     {user?.username && <div style={styles.sub}>@{user.username}</div>}
                                 </div>
                             </div>
@@ -212,7 +211,7 @@ export default function Navbar() {
                             <div style={styles.divider} />
 
                             <Link
-                                to="/Search"
+                                to="/search"
                                 style={styles.item}
                                 onMouseEnter={(e) => Object.assign(e.currentTarget.style, styles.itemHover)}
                                 onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}

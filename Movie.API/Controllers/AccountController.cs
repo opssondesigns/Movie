@@ -82,6 +82,7 @@ public class AccountController : ControllerBase
             Claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList()
         };
 
+        
         return Ok(userInfo);
     }
 
