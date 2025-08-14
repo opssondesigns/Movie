@@ -20,7 +20,7 @@ namespace Movie.Data
         public async Task<IEnumerable<OmdbMovie>> SearchMoviesByTitle(string title,CancellationToken ct = default)
         {
 
-            int maxPages = 20;
+            int maxPages = 100;
             int degreeOfParallelism = 6;
 
             var baseUrl = _configuration["MovieApi:BaseUrl"];
