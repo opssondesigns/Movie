@@ -6,6 +6,49 @@ import "../styles/MovieCarousel.css";
 
 const PAGE_SIZE = 12;
 
+function Spinner({ size = 28 }) {
+    return (
+        <div style={{ display: "grid", placeItems: "center", marginTop: 8 }}>
+            <svg
+                width={size}
+                height={size}
+                viewBox="0 0 50 50"
+                aria-label="Loading"
+                role="img"
+            >
+                <circle
+                    cx="25"
+                    cy="25"
+                    r="20"
+                    stroke="currentColor"
+                    strokeWidth="6"
+                    fill="none"
+                    opacity="0.25"
+                />
+                <circle
+                    cx="25"
+                    cy="25"
+                    r="20"
+                    stroke="currentColor"
+                    strokeWidth="6"
+                    strokeLinecap="round"
+                    fill="none"
+                    strokeDasharray="90 126"
+                >
+                    <animateTransform
+                        attributeName="transform"
+                        type="rotate"
+                        from="0 25 25"
+                        to="360 25 25"
+                        dur="0.8s"
+                        repeatCount="indefinite"
+                    />
+                </circle>
+            </svg>
+        </div>
+    );
+}
+
 export default function SearchFromHistory() {
     const [queries, setQueries] = useState([]);
     const [all, setAll] = useState([]);
@@ -77,9 +120,12 @@ export default function SearchFromHistory() {
                 ))}
             </div>
 
-            {loading && <div style={{ color: "#9CA3AF" }}>Loading…</div>}
+            {loading && <Spinner />}
+
             {!loading && total === 0 && (
-                <div style={{ color: "#9CA3AF" }}>No movies yet. Search a few titles to build history.</div>
+                <div style={{ color: "#9CA3AF" }}>
+                    No movies yet. Search a few titles to build history.
+                </div>
             )}
 
             {!loading && total > 0 && (

@@ -4,7 +4,7 @@ namespace Movie.Data
 {
     public interface IMovieRepository
     {
-        Task<IEnumerable<OmdbMovie>> SearchMoviesByTitle(string title);
+        Task<IEnumerable<OmdbMovie>> SearchMoviesByTitle(string title, CancellationToken ct);
         Task<OmdbMovie?> GetMovieByIdAsync(string imdbId);
     }
 }

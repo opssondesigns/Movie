@@ -27,9 +27,9 @@ namespace Movie.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMovies([FromQuery] string title)
+        public async Task<IActionResult> GetMovies([FromQuery] string title, CancellationToken ct)
         {            
-            var moviesTask = _movieService.GetMoviesAsync(title);        
+            var moviesTask = _movieService.GetMoviesAsync(title, ct);        
             
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;                
 
@@ -71,7 +71,7 @@ namespace Movie.Api.Controllers
             if (terms.Count == 0)
                 return Ok(new { queries = Array.Empty<string>(), total = 0, results = Array.Empty<object>() });
 
-            var tasks = terms.Select(t => _movieService.GetMoviesAsync(t)).ToArray();
+            var tasks = terms.Select(t => _movieService.GetMoviesAsync(t, ct)).ToArray();
             var lists = await Task.WhenAll(tasks);
 
             var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

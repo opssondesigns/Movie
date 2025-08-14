@@ -1,4 +1,5 @@
-﻿using Movie.Data;
+﻿using Microsoft.AspNetCore.Http;
+using Movie.Data;
 using Movie.Entities;
 
 namespace Movie.Services
@@ -12,9 +13,9 @@ namespace Movie.Services
             _movieRepository = movieRepository;
         }
 
-        public async Task<IEnumerable<dynamic>> GetMoviesAsync(string title)
+        public async Task<IEnumerable<dynamic>> GetMoviesAsync(string title, CancellationToken ct)
         {    
-            return await _movieRepository.SearchMoviesByTitle(title);
+            return await _movieRepository.SearchMoviesByTitle(title, ct);
         }
 
         public async Task<OmdbMovie?> GetMovieByIdAsync(string imdbId)

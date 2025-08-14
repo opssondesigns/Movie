@@ -7,6 +7,9 @@ using Movie.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Movie.Services.Background;
 using System.Security.Claims;
+using System.Net;
+using Polly;
+using Polly.Extensions.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -93,6 +96,27 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
+
+static IAsyncPolicy<HttpResponseMessage> RetryPolicy() =>
+    HttpPolicyExtensions.HandleTransientHttpError()
+        .OrResult(r => (int)r.StatusCode == 429)
+        .WaitAndRetryAsync(new[]
+        {
+            TimeSpan.FromMilliseconds(200),
+            TimeSpan.FromMilliseconds(400),
+            TimeSpan.FromMilliseconds(800),
+        });
+
+builder.Services.AddHttpClient<IMovieRepository, MovieRepository>(c =>
+{
+    c.Timeout = TimeSpan.FromSeconds(10);
+})
+.ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+{
+    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+    MaxConnectionsPerServer = 8,
+})
+.AddPolicyHandler(RetryPolicy());
 
 var app = builder.Build();
 

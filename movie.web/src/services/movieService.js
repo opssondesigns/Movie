@@ -1,40 +1,32 @@
 ﻿const API_URL = "http://localhost:5037/api/movie";
 const ACCOUNT_API = "http://localhost:5037/api/account";
 
-let currentController = null;
+export async function searchMoviesByTitle(title, { signal } = {}) {
+    const q = (title || "").trim();
+    if (!q) return [];
 
-export async function searchMoviesByTitle(title) {
-    if (currentController) {
-        currentController.abort();
+    const url = `${API_URL}?title=${encodeURIComponent(q)}`;
+
+    const res = await fetch(url, {
+        credentials: "include",
+        cache: "no-store",
+        signal, 
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to search movies");
     }
 
-    currentController = new AbortController();
-    const signal = currentController.signal;
+    const data = await res.json();
+    const list = Array.isArray(data) ? data : [];
 
-    try {
-        const response = await fetch(
-            `${API_URL}?title=${encodeURIComponent(title)}`,
-            {
-                signal,
-                credentials: "include",
-                cache: "no-store",
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error("Failed to search movies");
-        }
-
-        const data = await response.json();
-        return data || [];
-    } catch (error) {
-        if (error.name === "AbortError") {
-            return [];
-        }
-        throw error;
-    } finally {
-        currentController = null;
-    }
+    const seen = new Set();
+    return list.filter((m) => {
+        const id = m?.imdbID || m?.ImdbID;
+        if (!id || seen.has(id)) return false;
+        seen.add(id);
+        return true;
+    });
 }
 
 export async function getMovieById(imdbId) {
